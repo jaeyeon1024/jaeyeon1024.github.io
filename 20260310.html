@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>20260310HomeWork — 황재연</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=DM+Mono:wght@300;400&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e0e;
+      --surface: #161616;
+      --border: #2a2a2a;
+      --accent: #c8f060;
+      --accent2: #60d4f0;
+      --accent3: #f060c8;
+      --accent4: #f0a060;
+      --text: #f0ede6;
+      --muted: #888;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Serif KR', serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.35;
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* HEADER */
+    header {
+      padding: 5rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .back-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    h1 em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    .header-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .header-meta span { display: flex; align-items: center; gap: 0.4rem; }
+    .header-meta span::before { content: '—'; color: var(--accent); }
+
+    /* MAIN */
+    main { padding: 4rem 0 6rem; }
+
+    /* SECTION */
+    .section {
+      margin-bottom: 5rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .section:nth-child(1) { animation-delay: 0.1s; }
+    .section:nth-child(2) { animation-delay: 0.2s; }
+    .section:nth-child(3) { animation-delay: 0.3s; }
+    .section:nth-child(4) { animation-delay: 0.4s; }
+    .section:nth-child(5) { animation-delay: 0.5s; }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* OVERVIEW GRID */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .overview-card {
+      background: var(--surface);
+      padding: 1.5rem;
+      transition: background 0.2s;
+      cursor: default;
+    }
+    .overview-card:hover { background: #1e1e1e; }
+
+    .overview-card .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+      padding: 0.2rem 0.5rem;
+      display: inline-block;
+      border: 1px solid;
+    }
+    .tag-lp   { color: var(--accent);  border-color: var(--accent);  }
+    .tag-nlp  { color: var(--accent2); border-color: var(--accent2); }
+    .tag-so   { color: var(--accent4); border-color: var(--accent4); }
+    .tag-mo   { color: var(--accent3); border-color: var(--accent3); }
+
+    .overview-card .type-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .overview-card .type-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    /* PROBLEM CARD */
+    .problem-block {
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
+    .problem-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 1.5rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
+
+    .problem-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .problem-body {
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .problem-body { grid-template-columns: 1fr; }
+    }
+
+    .problem-situation {
+      font-size: 0.9rem;
+      color: #ccc;
+      font-weight: 300;
+      line-height: 1.85;
+    }
+
+    .problem-situation strong {
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    /* TABLE */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin: 0.8rem 0;
+    }
+    .data-table th {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .data-table td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid #1e1e1e;
+      color: #ccc;
+      font-weight: 300;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+
+    /* FORMULA BOX */
+    .formula-box {
+      background: #111;
+      border-left: 2px solid;
+      padding: 1.2rem 1.4rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 2;
+      color: #aaa;
+    }
+    .formula-box.lp   { border-color: var(--accent);  }
+    .formula-box.nlp  { border-color: var(--accent2); }
+    .formula-box.so   { border-color: var(--accent4); }
+    .formula-box.mo   { border-color: var(--accent3); }
+
+    .formula-box .f-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+
+    .formula-box .highlight { color: var(--text); font-weight: 400; }
+    .formula-box .answer    { color: var(--accent); }
+    .formula-box .answer2   { color: var(--accent2); }
+    .formula-box .answer4   { color: var(--accent4); }
+    .formula-box .answer3   { color: var(--accent3); }
+
+    /* RESULT BOX */
+    .result-box {
+      margin-top: 1rem;
+      padding: 0.9rem 1.2rem;
+      background: rgba(200,240,96,0.05);
+      border: 1px solid rgba(200,240,96,0.2);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+    .result-box.nlp  { background: rgba(96,212,240,0.05); border-color: rgba(96,212,240,0.2); color: var(--accent2); }
+    .result-box.so   { background: rgba(240,160,96,0.05); border-color: rgba(240,160,96,0.2); color: var(--accent4); }
+    .result-box.mo   { background: rgba(240,96,200,0.05); border-color: rgba(240,96,200,0.2); color: var(--accent3); }
+
+    /* PARETO IMAGE */
+    .pareto-wrap {
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-top: 1.5rem;
+    }
+    .pareto-wrap img {
+      width: 100%;
+      display: block;
+      filter: brightness(0.95);
+    }
+    .pareto-caption {
+      padding: 0.8rem 1.2rem;
+      background: var(--surface);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      border-top: 1px solid var(--border);
+    }
+
+    /* PARETO TABLE */
+    .pareto-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-top: 1rem;
+    }
+    .pareto-table th {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      background: var(--surface);
+    }
+    .pareto-table td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid #1e1e1e;
+      color: #ccc;
+      font-weight: 300;
+      text-align: center;
+    }
+    .pareto-table tr:last-child td { border-bottom: none; }
+    .pareto-table td:first-child { font-weight: 400; color: var(--text); text-align: left; }
+    .pareto-table tr:hover td { background: #1a1a1a; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <a class="back-link" href="index.html">← 돌아가기</a>
+    <p class="eyebrow">과제 2026.03.10</p>
+    <div class="header-meta">
+      <span>황재연 · 2026210340</span>
+      <span>컴퓨터·AI융합공학과</span>
+      <span>LP / NLP / SO / Multi-objective</span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- 1. 개요 -->
+    <section class="section">
+      <p class="section-label">개요</p>
+      <div class="overview-grid">
+        <div class="overview-card">
+          <span class="tag tag-lp">LP</span>
+          <div class="type-name">선형 계획법</div>
+          <div class="type-desc">목적함수·제약조건 모두 선형. 모든 값 확정.</div>
+        </div>
+        <div class="overview-card">
+          <span class="tag tag-nlp">NLP</span>
+          <div class="type-name">비선형 계획법</div>
+          <div class="type-desc">목적함수 또는 제약조건에 비선형 항 포함.</div>
+        </div>
+        <div class="overview-card">
+          <span class="tag tag-so">SO</span>
+          <div class="type-name">확률적 최적화</div>
+          <div class="type-desc">미래 파라미터가 확률 분포를 따르는 불확실 모델.</div>
+        </div>
+        <div class="overview-card">
+          <span class="tag tag-mo">MO</span>
+          <div class="type-name">다목적 최적화</div>
+          <div class="type-desc">서로 충돌하는 목적함수 여러 개. Pareto front 탐색.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. LP -->
+    <section class="section">
+      <p class="section-label">LP — 선형 계획법</p>
+      <div class="problem-block">
+        <div class="problem-header">
+          <span class="problem-title">🥢 점심 메뉴 고르기</span>
+          <span class="tag tag-lp">LP</span>
+        </div>
+        <div class="problem-body">
+          <div>
+            <p class="problem-situation">
+              학교 앞 분식집에서 <strong>떡볶이</strong>와 <strong>김밥</strong>을
+              몇 인분씩 먹을지 결정. 포만감을 최대화하되
+              예산과 최대 섭취량 제한을 지켜야 한다.
+            </p>
+            <table class="data-table" style="margin-top:1rem">
+              <thead>
+                <tr><th></th><th>떡볶이</th><th>김밥</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>가격</td><td>4,000원</td><td>2,000원</td></tr>
+                <tr><td>포만감</td><td>4점</td><td>3점</td></tr>
+                <tr><td>최소</td><td>1인분</td><td>1줄</td></tr>
+                <tr><td>최대</td><td>2인분</td><td>3줄</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div class="formula-box lp">
+              <div class="f-label">결정변수</div>
+              x₁ = 떡볶이 인분 수<br/>
+              x₂ = 김밥 줄 수<br/><br/>
+              <div class="f-label">목적함수</div>
+              <span class="highlight">max  Z = 4x₁ + 3x₂</span><br/><br/>
+              <div class="f-label">제약조건</div>
+              4000x₁ + 2000x₂ ≤ 14,000<br/>
+              x₁ ≤ 2,  x₂ ≤ 3<br/>
+              x₁ ≥ 1,  x₂ ≥ 1<br/>
+              x₁, x₂ ≥ 0
+            </div>
+            <div class="result-box">
+              ✓ 최적해: 떡볶이 2인분, 김밥 3줄 → 포만감 17점
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. NLP -->
+    <section class="section">
+      <p class="section-label">NLP — 비선형 계획법</p>
+      <div class="problem-block">
+        <div class="problem-header">
+          <span class="problem-title">🚴 사이클 페달링</span>
+          <span class="tag tag-nlp">NLP</span>
+        </div>
+        <div class="problem-body">
+          <div>
+            <p class="problem-situation">
+              실내 자전거 운동 시 <strong>페달 속도(x₁)</strong>와
+              <strong>저항 강도(x₂)</strong>를 설정. 인체 근육은
+              특정 구간에서 리듬이 맞을 때 효율이 최대가 되는
+              <strong>sin 곡선</strong> 특성을 가진다.
+            </p>
+            <table class="data-table" style="margin-top:1rem">
+              <thead>
+                <tr><th></th><th>페달 속도</th><th>저항 강도</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>칼로리 소모</td><td>10·sin(πx₁/6)</td><td>8·sin(πx₂/6)</td></tr>
+                <tr><td>심박수 부하</td><td>2x₁ bpm</td><td>3x₂ bpm</td></tr>
+                <tr><td>범위</td><td>1 ~ 5단계</td><td>1 ~ 5단계</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div class="formula-box nlp">
+              <div class="f-label">결정변수</div>
+              x₁ = 페달 속도 단계<br/>
+              x₂ = 저항 강도 단계<br/><br/>
+              <div class="f-label">목적함수 (비선형)</div>
+              <span class="highlight">max  Z = 10·sin(πx₁/6) + 8·sin(πx₂/6)</span><br/><br/>
+              <div class="f-label">제약조건</div>
+              2x₁ + 3x₂ ≤ 20<br/>
+              1 ≤ x₁ ≤ 5,  1 ≤ x₂ ≤ 5<br/>
+              x₁, x₂ ≥ 0
+            </div>
+            <div class="result-box nlp">
+              ✓ 최적해: 속도 3단계, 강도 3단계 → 칼로리 소모 18 kcal
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Stochastic -->
+    <section class="section">
+      <p class="section-label">SO — 확률적 최적화</p>
+      <div class="problem-block">
+        <div class="problem-header">
+          <span class="problem-title">🎫 공연 티켓 준비</span>
+          <span class="tag tag-so">SO</span>
+        </div>
+        <div class="problem-body">
+          <div>
+            <p class="problem-situation">
+              공연장 운영자가 <strong>일반석(q₁)</strong>과
+              <strong>VIP석(q₂)</strong> 티켓을 몇 장씩 준비할지 결정.
+              실제 관객 수요 D는 공연 당일까지 알 수 없다.
+              수요를 <strong>확률 분포</strong>로 모델링해 기댓값을 최적화한다.
+            </p>
+            <table class="data-table" style="margin-top:1rem">
+              <thead>
+                <tr><th>시나리오</th><th>수요</th><th>확률</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>수요 적음</td><td>50명</td><td>0.3</td></tr>
+                <tr><td>수요 보통</td><td>80명</td><td>0.5</td></tr>
+                <tr><td>수요 많음</td><td>110명</td><td>0.2</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div class="formula-box so">
+              <div class="f-label">결정변수</div>
+              q₁ = 일반석 수량,  q₂ = VIP석 수량<br/><br/>
+              <div class="f-label">목적함수</div>
+              <span class="highlight">max  E[수익]</span><br/>
+              = 0.3·수익(q,50)<br/>
+              + 0.5·수익(q,80)<br/>
+              + 0.2·수익(q,110)<br/><br/>
+              <div class="f-label">제약조건</div>
+              q₁ + q₂ ≤ 100<br/>
+              q₁ ≥ 40,  q₂ ≥ 10
+            </div>
+            <div class="result-box so">
+              ✓ 최적해: 일반석 60장, VIP석 40장 → 기대 수익 1,610,000원
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Multi-objective -->
+    <section class="section">
+      <p class="section-label">MO — 다목적 최적화</p>
+      <div class="problem-block">
+        <div class="problem-header">
+          <span class="problem-title">💻 노트북 구매</span>
+          <span class="tag tag-mo">MO</span>
+        </div>
+        <div class="problem-body">
+          <div>
+            <p class="problem-situation">
+              <strong>CPU 성능 등급(x₁)</strong>과
+              <strong>배터리 용량 등급(x₂)</strong>을 결정.
+              성능을 높이면 배터리가 줄고, 배터리를 높이면 가격이 오른다.
+              <strong>세 목표가 서로 충돌</strong>하므로 단일 최적해가 없다.
+            </p>
+            <table class="data-table" style="margin-top:1rem">
+              <thead>
+                <tr><th>목적함수</th><th>방향</th><th>수식</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>가격</td><td>최소화</td><td>20x₁ + 10x₂</td></tr>
+                <tr><td>성능</td><td>최대화</td><td>10·x₁^1.2 + 3x₂</td></tr>
+                <tr><td>배터리</td><td>최대화</td><td>−1.5x₁ + 9x₂</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div class="formula-box mo">
+              <div class="f-label">목적함수 (3개)</div>
+              <span class="highlight">min  f₁ = 20x₁ + 10x₂</span><br/>
+              <span class="highlight">max  f₂ = 10·x₁^1.2 + 3x₂</span><br/>
+              <span class="highlight">max  f₃ = −1.5x₁ + 9x₂</span><br/><br/>
+              <div class="f-label">제약조건</div>
+              20x₁ + 10x₂ ≤ 150<br/>
+              1 ≤ x₁ ≤ 5,  1 ≤ x₂ ≤ 5
+            </div>
+            <div class="result-box mo">
+              ✓ 단일 최적해 없음 — Pareto front에서 균형점 선택
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pareto 후보 테이블 -->
+      <table class="pareto-table">
+        <thead>
+          <tr>
+            <th>후보</th><th>CPU (x₁)</th><th>배터리 (x₂)</th>
+            <th>가격</th><th>성능</th><th>배터리 점수</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>🔴 성능 중심</td><td>5.0</td><td>1.0</td><td>110</td><td>65.0</td><td>−2.5 + 9 = 6.5</td></tr>
+          <tr><td>🟢 배터리 중심</td><td>1.0</td><td>5.0</td><td>70</td><td>13.0</td><td>43.5</td></tr>
+          <tr><td>🔵 가격 중심</td><td>1.0</td><td>1.0</td><td>30</td><td>10.0</td><td>7.5</td></tr>
+          <tr><td>🟡 균형</td><td>3.6</td><td>6.4</td><td>136</td><td>46.7</td><td>52.2</td></tr>
+        </tbody>
+      </table>
+
+      <!-- MATLAB 3D Pareto 결과 이미지 -->
+      <div class="pareto-wrap">
+        <img src="matlabimage1.png" alt="MATLAB 3D Pareto Front 시각화 결과"/>
+        <div class="pareto-caption">
+          Fig. MATLAB 3D Pareto Curve — Performance / Battery / Price 세 목표의 트레이드오프 시각화
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-name">황재연 · HWANG JAEYEON · 2026210340</span>
+      <span class="footer-name">컴퓨터·AI융합공학과 · 최적화 이론 과제</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

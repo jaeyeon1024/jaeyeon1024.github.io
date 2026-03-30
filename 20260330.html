@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>20260330 Homework4 — 황재연</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=DM+Mono:wght@300;400&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e0e;
+      --surface: #161616;
+      --border: #2a2a2a;
+      --accent: #c8f060;
+      --accent2: #60d4f0;
+      --text: #f0ede6;
+      --muted: #888;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Serif KR', serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.35;
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* HEADER */
+    header {
+      padding: 5rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .back-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    h1 em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    .header-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .header-meta span { display: flex; align-items: center; gap: 0.4rem; }
+    .header-meta span::before { content: '—'; color: var(--accent); }
+
+    /* MAIN */
+    main { padding: 4rem 0 6rem; }
+
+    /* SECTION */
+    .section {
+      margin-bottom: 5rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .section:nth-child(1) { animation-delay: 0.1s; }
+    .section:nth-child(2) { animation-delay: 0.2s; }
+    .section:nth-child(3) { animation-delay: 0.3s; }
+    .section:nth-child(4) { animation-delay: 0.4s; }
+    .section:nth-child(5) { animation-delay: 0.5s; }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* TAG */
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      display: inline-block;
+      border: 1px solid;
+    }
+    .tag-py  { color: var(--accent2); border-color: var(--accent2); }
+    .tag-ai  { color: var(--accent);  border-color: var(--accent); }
+
+    /* INFO GRID */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .info-card {
+      background: var(--surface);
+      padding: 1.5rem;
+      transition: background 0.2s;
+    }
+    .info-card:hover { background: #1e1e1e; }
+
+    .info-card .label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--accent2);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .info-card .value {
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 300;
+    }
+
+    /* EXPERIMENT BLOCK */
+    .exp-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .exp-block {
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .exp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .exp-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .exp-config {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: #111;
+    }
+
+    .exp-config pre {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent2);
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .exp-body {
+      padding: 1.5rem;
+    }
+
+    .exp-body p {
+      font-size: 0.9rem;
+      line-height: 1.9;
+      color: #ccc;
+      font-weight: 300;
+      margin-bottom: 0.6rem;
+    }
+
+    .exp-caption {
+      padding: 0.8rem 1.5rem;
+      background: #111;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      border-top: 1px solid var(--border);
+    }
+
+    /* CONCLUSION BLOCK */
+    .conclusion-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      line-height: 2;
+    }
+
+    .conclusion-block p {
+      font-size: 0.95rem;
+      color: #ccc;
+      font-weight: 300;
+      margin-bottom: 0.8rem;
+    }
+
+    .conclusion-block p:last-child { margin-bottom: 0; }
+
+    .highlight {
+      color: var(--accent);
+      font-weight: 400;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      .exp-body { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <a class="back-link" href="index.html">← 돌아가기</a>
+    <p class="eyebrow">과제 2026.03.30</p>
+    <h1>Homework <em>4</em></h1>
+    <div class="header-meta">
+      <span>황재연 · 2026210340</span>
+      <span>컴퓨터·AI융합공학과</span>
+      <span>Gemini API · Generation Config</span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- 기본 정보 -->
+    <section class="section">
+      <p class="section-label">파라미터 기본 정보</p>
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="label">temperature</div>
+          <div class="value">범위: 0 ~ 2.0<br/>높을수록 창의적·다양한 출력</div>
+        </div>
+        <div class="info-card">
+          <div class="label">top_k</div>
+          <div class="value">확률 상위 k개 토큰 후보 선택<br/>먼저 적용됨</div>
+        </div>
+        <div class="info-card">
+          <div class="label">top_p</div>
+          <div class="value">누적 확률 p 이내 토큰 선택<br/>top_k 이후 적용됨</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 실험 1 — temperature=2.0, top_k=1 -->
+    <section class="section">
+      <p class="section-label">실험 결과</p>
+      <div class="exp-grid">
+
+        <div class="exp-block">
+          <div class="exp-header">
+            <span class="exp-num">EXP · 01 &nbsp;|&nbsp; temperature=2.0, top_k=1</span>
+            <span class="tag tag-ai">Gemini</span>
+          </div>
+          <div class="exp-config">
+<pre>generation_config = {
+  "temperature": 2.0,
+  "top_k": 1,
+  "max_output_tokens": 2048,
+}</pre>
+          </div>
+          <div class="exp-body">
+            <p>질문: <strong>37 * 25 = ?</strong></p>
+            <p>동일한 질문을 두 번 실행했을 때, 같은 질문에 대해 다른 풀이 방식으로 응답이 생성되었다.</p>
+            <p>— v1: 분배 법칙(30+7)×25 방식 사용</p>
+            <p>— v2: 25=100/4 치환 방식, 세로곱셈, 분배 법칙 등 세 가지 방식 제시</p>
+          </div>
+          <div class="exp-caption">→ 같은 질문에도 temperature에 따라 여러 응답이 생성됨</div>
+        </div>
+
+        <!-- 실험 2 — temperature=2.0, top_k=1 (판타지 소설) -->
+        <div class="exp-block">
+          <div class="exp-header">
+            <span class="exp-num">EXP · 02 &nbsp;|&nbsp; temperature=2.0, top_k=1</span>
+            <span class="tag tag-ai">Gemini</span>
+          </div>
+          <div class="exp-config">
+<pre>generation_config = {
+  "temperature": 2.0,
+  "top_k": 1,
+  "max_output_tokens": 2048,
+}</pre>
+          </div>
+          <div class="exp-body">
+            <p>질문: <strong>판타지 소설의 첫 문장 선택지를 줘</strong></p>
+            <p>temperature=2.0 / top_k=1 조합으로 두 번 실행한 결과, 두 번 모두 동일한 10개의 문장 선택지가 출력되었다.</p>
+            <p>— top_k=1 이면 매 토큰마다 가장 확률 높은 단 하나의 후보만 선택되므로, temperature가 높아도 선택의 여지가 없어 출력이 고정된다.</p>
+          </div>
+          <div class="exp-caption">→ top_k와 top_p가 낮으면 temperature에 무관하게 고정된 답을 출력함</div>
+        </div>
+
+        <!-- 실험 3 — temperature=0.2, top_k=10, top_p=0.9 -->
+        <div class="exp-block">
+          <div class="exp-header">
+            <span class="exp-num">EXP · 03 &nbsp;|&nbsp; temperature=0.2, top_k=10, top_p=0.9</span>
+            <span class="tag tag-ai">Gemini</span>
+          </div>
+          <div class="exp-config">
+<pre>generation_config = {
+  "temperature": 0.2,
+  "top_p": 0.9,
+  "top_k": 10,
+  "max_output_tokens": 512,
+}</pre>
+          </div>
+          <div class="exp-body">
+            <p>질문: <strong>판타지 소설의 첫 문장 선택지를 줘</strong></p>
+            <p>동일한 질문을 두 번 실행했을 때 서로 다른 선택지가 출력되었다.</p>
+            <p>— 1회차: 5개의 문장 (각 문장의 주제와 스타일이 명확히 제시됨)</p>
+            <p>— 2회차: 5개의 다른 문장 (신비로운 분위기, 주인공의 특별함 등 다른 방향성)</p>
+            <p>temperature가 낮음에도 top_k=10, top_p=0.9 로 후보 폭이 넓어 응답이 달라졌다.</p>
+          </div>
+          <div class="exp-caption">→ temperature가 낮아도 top_k와 top_p가 높으면 다양한 답변이 생성됨</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 결론 -->
+    <section class="section">
+      <p class="section-label">결론</p>
+      <div class="conclusion-block">
+        <p>
+          <span class="highlight">top_k</span>와 <span class="highlight">top_p</span>가 높을수록 다양한 답변을 생성할 수 있고,
+          낮을수록 정형화된 고정 답변을 출력한다.
+        </p>
+        <p>
+          또한 top_k와 top_p가 모두 어느 정도 높을 때 비로소
+          <span class="highlight">temperature</span>가 출력 다양성에 영향을 주는 것으로 추측할 수 있다.
+        </p>
+        <p>
+          즉, top_k=1처럼 후보가 단 하나로 고정된 상태에서는 temperature 값이 아무리 높아도
+          매 토큰마다 선택의 여지가 없으므로 결과가 항상 동일하게 수렴한다.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-name">황재연 · HWANG JAEYEON · 2026210340</span>
+      <span class="footer-name">컴퓨터·AI융합공학과 · Homework 4</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
